@@ -1,0 +1,124 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+const slides = [
+  {
+    title: 'Slab Sawing',
+    description: 'Precision cutting through concrete slabs for mechanical, electrical, and plumbing installations with minimal disturbance.',
+    image: '/slides/coring-slab-sawing.svg',
+  },
+  {
+    title: 'Core Drilling',
+    description: 'Expert drilling to create precise holes through concrete for utilities and structural modifications.',
+    image: '/slides/coring-core-drilling.svg',
+  },
+  {
+    title: 'Concrete Grinding',
+    description: 'Surface preparation and finishing through controlled grinding to achieve smooth, even concrete surfaces.',
+    image: '/slides/coring-concrete-grinding.svg',
+  },
+  {
+    title: 'Wire Sawing',
+    description: 'Advanced wire cutting technology for complex concrete separation and precision demolition work.',
+    image: '/slides/coring-wire-sawing.svg',
+  },
+  {
+    title: 'Wall Sawing',
+    description: 'Specialized wall cutting services for openings, alterations, and structural modifications.',
+    image: '/slides/coring-wall-sawing.svg',
+  },
+  {
+    title: 'Breaking & Removal',
+    description: 'Controlled concrete breaking and removal services with proper waste management and site cleanup.',
+    image: '/slides/coring-breaking-removal.svg',
+  },
+];
+
+export function CoringHero() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((previous) => (previous + 1) % slides.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  function goToSlide(index: number) {
+    setActiveIndex(index);
+  }
+
+  function goToPrevious() {
+    setActiveIndex((previous) => (previous - 1 + slides.length) % slides.length);
+  }
+
+  function goToNext() {
+    setActiveIndex((previous) => (previous + 1) % slides.length);
+  }
+
+  return (
+    <section id="coring-hero" className="scroll-mt-28">
+      <div className="relative min-h-[calc(100vh-73px)] overflow-hidden border-b border-slate-700/70">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.title}
+            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ${
+              index === activeIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ backgroundImage: `url(${slide.image})` }}
+          />
+        ))}
+
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/92 via-orange-950/70 to-slate-900/30" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_26%,rgba(234,88,12,0.24),transparent_42%),radial-gradient(circle_at_82%_75%,rgba(20,184,166,0.16),transparent_36%)]" />
+
+        <div className="relative z-10 mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl flex-col justify-center px-6 py-12 md:px-10">
+          <p className="animate-fade-up text-sm font-semibold tracking-[0.28em] text-slate-300 uppercase">
+            Coring Services
+          </p>
+          <h1 className="animate-fade-up-delay-1 mt-4 max-w-3xl font-serif text-4xl leading-tight text-white md:text-6xl">
+            {slides[activeIndex].title}
+          </h1>
+          <p className="animate-fade-up-delay-2 mt-5 max-w-2xl text-base leading-8 text-slate-100 md:text-xl">
+            {slides[activeIndex].description}
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={goToPrevious}
+              className="rounded-full border border-slate-500 bg-slate-900/60 px-4 py-2 text-sm font-medium text-slate-100 backdrop-blur transition hover:bg-slate-800"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={goToNext}
+              className="rounded-full border border-slate-500 bg-slate-900/60 px-4 py-2 text-sm font-medium text-slate-100 backdrop-blur transition hover:bg-slate-800"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.title}
+              type="button"
+              onClick={() => goToSlide(index)}
+              aria-label={`Go to ${slide.title}`}
+              className={`h-2.5 rounded-full transition-all ${
+                index === activeIndex
+                  ? 'w-8 bg-slate-100'
+                  : 'w-2.5 bg-slate-400/70 hover:bg-slate-200'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

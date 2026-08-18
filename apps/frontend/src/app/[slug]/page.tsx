@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { ServiceDetail } from '@/components/services/ServiceDetail';
 import { getServiceBySlug, services } from '@/lib/services';
@@ -19,6 +19,10 @@ export default async function ServicePage({ params, searchParams }: ServicePageP
 
   if (!service) {
     notFound();
+  }
+
+  if (slug === 'construction-services' && subservice === 'coring') {
+    redirect('/coring');
   }
 
   const initialExpandedSubserviceId =

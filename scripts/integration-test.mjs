@@ -1,7 +1,6 @@
 import { spawn } from 'node:child_process';
 
-const integrationPort =
-  process.env.INTEGRATION_BACKEND_PORT ?? '4300';
+const integrationPort = process.env.INTEGRATION_BACKEND_PORT ?? '4300';
 const baseUrl = process.env.INTEGRATION_BASE_URL ?? `http://127.0.0.1:${integrationPort}`;
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 

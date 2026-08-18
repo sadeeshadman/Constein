@@ -368,7 +368,7 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
             <>
               <h2 className="font-serif text-2xl text-white">Subservices</h2>
               {renderSubserviceList(filteredSubservices)}
-              
+
               {shouldHideCoringSubservice && (
                 <div className="mt-6 rounded-xl border border-orange-500/40 bg-gradient-to-r from-orange-600/15 via-slate-900 to-slate-900 p-6">
                   <p className="text-xs font-semibold tracking-[0.2em] text-orange-300 uppercase">
@@ -376,7 +376,9 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
                   </p>
                   <h3 className="mt-3 font-serif text-2xl text-white">Precision Coring Services</h3>
                   <p className="mt-2 text-sm leading-7 text-slate-300">
-                    Our dedicated coring team specializes in concrete sawing, drilling, grinding, and removal services. Explore our full range of coring solutions with detailed service descriptions and capabilities.
+                    Our dedicated coring team specializes in concrete sawing, drilling, grinding,
+                    and removal services. Explore our full range of coring solutions with detailed
+                    service descriptions and capabilities.
                   </p>
                   <Link
                     href="/coring"

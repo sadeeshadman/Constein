@@ -70,7 +70,9 @@ export function CoringServices() {
             <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-orange-400/10 blur-2xl" />
 
             <div className="relative z-10">
-              <h3 className="font-serif text-xl font-semibold text-orange-300">{subservice.name}</h3>
+              <h3 className="font-serif text-xl font-semibold text-orange-300">
+                {subservice.name}
+              </h3>
               <p className="mt-3 text-sm leading-6 text-slate-300">{subservice.description}</p>
 
               <button
@@ -90,7 +92,8 @@ export function CoringServices() {
           Ready to Get Started?
         </h2>
         <p className="mt-3 text-slate-300">
-          Contact us today to discuss your coring project. Our team is ready to provide a customized solution for your needs.
+          Contact us today to discuss your coring project. Our team is ready to provide a customized
+          solution for your needs.
         </p>
         <button
           type="button"

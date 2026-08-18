@@ -13,7 +13,8 @@ export const metadata = {
     'Expert concrete coring services in Ottawa including slab sawing, core drilling, concrete grinding, wire sawing, wall sawing, and breaking & removal. Get a quote today.',
   openGraph: {
     title: 'Professional Coring Services in Ottawa | Constein Group',
-    description: 'Expert concrete coring solutions for construction projects. Precision sawing, drilling, and removal services.',
+    description:
+      'Expert concrete coring solutions for construction projects. Precision sawing, drilling, and removal services.',
   },
 };
 

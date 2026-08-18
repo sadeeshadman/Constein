@@ -45,10 +45,16 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
   const [isLaunchingReport, setIsLaunchingReport] = useState(false);
   const [reportLaunchError, setReportLaunchError] = useState('');
 
-  const ownerSubservices = service.subservices.filter(
+  // For construction-services, filter out coring to show separate callout
+  const shouldHideCoringSubservice = service.slug === 'construction-services';
+  const filteredSubservices = shouldHideCoringSubservice
+    ? service.subservices.filter((subservice) => subservice.id !== 'coring')
+    : service.subservices;
+
+  const ownerSubservices = filteredSubservices.filter(
     (subservice) => subservice.audience === 'owner',
   );
-  const tenantSubservices = service.subservices.filter(
+  const tenantSubservices = filteredSubservices.filter(
     (subservice) => subservice.audience === 'tenant',
   );
   const hasAudienceSections = ownerSubservices.length > 0 && tenantSubservices.length > 0;
@@ -361,7 +367,25 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
           ) : (
             <>
               <h2 className="font-serif text-2xl text-white">Subservices</h2>
-              {renderSubserviceList(service.subservices)}
+              {renderSubserviceList(filteredSubservices)}
+              
+              {shouldHideCoringSubservice && (
+                <div className="mt-6 rounded-xl border border-orange-500/40 bg-gradient-to-r from-orange-600/15 via-slate-900 to-slate-900 p-6">
+                  <p className="text-xs font-semibold tracking-[0.2em] text-orange-300 uppercase">
+                    Specialized Service
+                  </p>
+                  <h3 className="mt-3 font-serif text-2xl text-white">Precision Coring Services</h3>
+                  <p className="mt-2 text-sm leading-7 text-slate-300">
+                    Our dedicated coring team specializes in concrete sawing, drilling, grinding, and removal services. Explore our full range of coring solutions with detailed service descriptions and capabilities.
+                  </p>
+                  <Link
+                    href="/coring"
+                    className="mt-4 inline-flex items-center rounded-md border border-orange-400/40 bg-orange-600/20 px-4 py-2 text-sm font-semibold text-orange-200 transition hover:border-orange-400 hover:bg-orange-600/30 hover:text-orange-100"
+                  >
+                    View Full Coring Services →
+                  </Link>
+                </div>
+              )}
             </>
           )}
         </div>

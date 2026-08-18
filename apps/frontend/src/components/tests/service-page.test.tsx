@@ -4,9 +4,13 @@ import ServicePage, { generateStaticParams } from '@/app/[slug]/page';
 const notFoundMock = jest.fn(() => {
   throw new Error('NEXT_NOT_FOUND');
 });
+const redirectMock = jest.fn((destination: string) => {
+  throw new Error(`NEXT_REDIRECT:${destination}`);
+});
 
 jest.mock('next/navigation', () => ({
   notFound: () => notFoundMock(),
+  redirect: (destination: string) => redirectMock(destination),
 }));
 
 describe('ServicePage route', () => {
@@ -31,7 +35,10 @@ describe('ServicePage route', () => {
     render(element);
 
     expect(screen.getByRole('heading', { name: 'Construction Services' })).toBeInTheDocument();
-    expect(screen.getByText('Coring')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View Full Coring Services →' })).toHaveAttribute(
+      'href',
+      '/coring',
+    );
   });
 
   test('calls notFound for invalid slug', async () => {
@@ -43,17 +50,14 @@ describe('ServicePage route', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
   });
 
-  test('expands requested subservice from query params', async () => {
-    const element = await ServicePage({
-      params: Promise.resolve({ slug: 'construction-services' }),
-      searchParams: Promise.resolve({ subservice: 'coring' }),
-    });
-    render(element);
+  test('redirects the old coring query URL to the dedicated page', async () => {
+    await expect(
+      ServicePage({
+        params: Promise.resolve({ slug: 'construction-services' }),
+        searchParams: Promise.resolve({ subservice: 'coring' }),
+      }),
+    ).rejects.toThrow('NEXT_REDIRECT:/coring');
 
-    expect(
-      screen.getByText(
-        'Precision concrete coring for mechanical, electrical, and plumbing pathways with controlled site practices.',
-      ),
-    ).toBeInTheDocument();
+    expect(redirectMock).toHaveBeenCalledWith('/coring');
   });
 });

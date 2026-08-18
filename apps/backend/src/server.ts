@@ -18,7 +18,8 @@ app.use('/api/quotes', quotesRouter);
 app.use('/api/upload-image', uploadRouter);
 
 const port = Number(process.env.PORT ?? 4000);
+const host = process.env.HOST ?? '0.0.0.0';
 
-app.listen(port, () => {
-  console.log(`Backend listening on http://localhost:${port}`);
+app.listen(port, host, () => {
+  console.log(`Backend listening on ${host}:${port}`);
 });

@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 
 const integrationPort =
-  process.env.INTEGRATION_BACKEND_PORT ?? String(4300 + Math.floor(Math.random() * 200));
+  process.env.INTEGRATION_BACKEND_PORT ?? '4300';
 const baseUrl = process.env.INTEGRATION_BASE_URL ?? `http://127.0.0.1:${integrationPort}`;
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
@@ -20,7 +20,7 @@ async function waitForBackendReady() {
 
   for (let index = 0; index < attempts; index += 1) {
     try {
-      const response = await fetch(`${baseUrl}/api/health/db`);
+      const response = await fetch(`${baseUrl}/api/health/ready`);
 
       if (response.ok) {
         return;
@@ -107,6 +107,8 @@ async function main() {
 
   try {
     await Promise.race([waitForBackendReady(), exitPromise]);
+    const livenessResponse = await fetch(`${baseUrl}/api/health/live`);
+    assert(livenessResponse.status === 200, 'Expected 200 from GET /api/health/live');
     await runIntegrationAssertions();
   } finally {
     if (!backendProcess.killed) {

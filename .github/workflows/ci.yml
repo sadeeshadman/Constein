@@ -19,8 +19,9 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run check:frontend
+
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 

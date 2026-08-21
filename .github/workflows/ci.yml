@@ -19,6 +19,12 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run check:frontend
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:

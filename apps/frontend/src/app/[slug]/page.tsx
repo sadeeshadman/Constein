@@ -31,10 +31,7 @@ export async function generateMetadata({ params }: Readonly<ServicePageProps>) {
   };
 }
 
-export default async function ServicePage({
-  params,
-  searchParams,
-}: Readonly<ServicePageProps>) {
+export default async function ServicePage({ params, searchParams }: Readonly<ServicePageProps>) {
   const { slug } = await params;
   const { subservice } = await searchParams;
 

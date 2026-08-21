@@ -11,7 +11,8 @@ const serviceThemes: Record<string, string> = {
 };
 
 export function ServiceHero({ service }: Readonly<ServiceHeroProps>) {
-  const theme = serviceThemes[service.slug] ?? 'from-slate-950/95 via-slate-950/85 to-orange-950/45';
+  const theme =
+    serviceThemes[service.slug] ?? 'from-slate-950/95 via-slate-950/85 to-orange-950/45';
 
   return (
     <section className="relative overflow-hidden border-b border-slate-700/70">

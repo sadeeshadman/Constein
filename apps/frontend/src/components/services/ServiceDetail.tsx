@@ -200,7 +200,10 @@ export function ServiceDetail({
     return (
       <div className="grid gap-5 md:grid-cols-2">
         {resources.map((resource) => (
-          <article key={resource.id} className="rounded-xl border border-slate-700 bg-slate-900/90 p-5">
+          <article
+            key={resource.id}
+            className="rounded-xl border border-slate-700 bg-slate-900/90 p-5"
+          >
             <h3 className="font-serif text-xl text-white">{resource.name}</h3>
             <p className="mt-2 text-sm leading-7 text-slate-300">{resource.description}</p>
             {resource.forms?.length ? (
@@ -345,7 +348,8 @@ export function ServiceDetail({
             </p>
             <h2 className="mt-2 font-serif text-2xl text-white">Property Forms</h2>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
-              Forms and documents for owners and tenants are kept separate from our service offerings.
+              Forms and documents for owners and tenants are kept separate from our service
+              offerings.
             </p>
           </div>
           {renderResourceList(resourceSubservices)}

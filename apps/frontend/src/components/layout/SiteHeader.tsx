@@ -71,7 +71,7 @@ export function SiteHeader() {
               <div
                 role="menu"
                 aria-label="Services menu"
-                className="absolute left-0 top-full z-40 mt-2 w-64 overflow-hidden rounded-md border border-slate-700 bg-slate-950/98 shadow-2xl backdrop-blur"
+                className="absolute top-full left-0 z-40 mt-2 w-64 overflow-hidden rounded-md border border-slate-700 bg-slate-950/98 shadow-2xl backdrop-blur"
               >
                 <div className="flex flex-col gap-1 py-2">
                   {services.map((service) => (
@@ -110,7 +110,6 @@ export function SiteHeader() {
           </Link>
         </nav>
       </div>
-
     </header>
   );
 }

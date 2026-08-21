@@ -41,9 +41,7 @@ describe('ServiceDetail', () => {
   });
 
   test('renders all coring subservices', () => {
-    const coringService = services.find(
-      (service) => service.slug === 'coring',
-    );
+    const coringService = services.find((service) => service.slug === 'coring');
 
     if (!coringService) {
       throw new Error('Expected coring service to exist');

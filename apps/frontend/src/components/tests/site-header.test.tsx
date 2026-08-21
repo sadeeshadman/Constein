@@ -2,24 +2,36 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { SiteHeader } from '../layout/SiteHeader';
 
 describe('SiteHeader', () => {
-  test('opens services dropdown on click and shows service columns', () => {
+  test('opens a compact services dropdown positioned under the Services button', () => {
     render(<SiteHeader />);
 
     const servicesButton = screen.getByRole('button', { name: 'Services' });
     fireEvent.click(servicesButton);
 
-    expect(screen.getByRole('link', { name: 'Home Inspection' })).toBeInTheDocument();
-    const propertyManagementLinks = screen.getAllByRole('link', { name: 'Property Management' });
-    expect(
-      propertyManagementLinks.some((link) => link.getAttribute('href') === '/property-management'),
-    ).toBe(true);
-    expect(screen.getByRole('link', { name: 'Construction Services' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Engineering Consultants' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Coring' })).toHaveAttribute(
+    const servicesMenu = screen.getByRole('menu', { name: 'Services menu' });
+
+    expect(servicesMenu).toHaveClass('absolute', 'left-0', 'top-full');
+    expect(servicesMenu).toHaveClass('w-64');
+    expect(screen.getByRole('link', { name: 'Home Inspection' })).toHaveAttribute(
       'href',
-      '/construction-services?subservice=coring',
+      '/home-inspection',
     );
-    expect(screen.queryByText('No subservices listed.')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Property Management' })).toHaveAttribute(
+      'href',
+      '/property-management',
+    );
+    expect(screen.getByRole('link', { name: 'Construction Services' })).toHaveAttribute(
+      'href',
+      '/construction',
+    );
+    expect(screen.getByRole('link', { name: 'Coring' })).toHaveAttribute('href', '/coring');
+    expect(screen.getByText('Home Inspection')).toBeInTheDocument();
+    expect(screen.getByText('Property Management')).toBeInTheDocument();
+    expect(screen.getByText('Construction Services')).toBeInTheDocument();
+    expect(screen.getByText('Coring')).toBeInTheDocument();
+    expect(screen.queryByText('Slab Sawing')).not.toBeInTheDocument();
+    expect(screen.queryByText('Concrete Testing')).not.toBeInTheDocument();
+    expect(screen.queryByText('Engineering Consultants')).not.toBeInTheDocument();
   });
 
   test('closes services dropdown when clicked again', () => {
@@ -27,7 +39,7 @@ describe('SiteHeader', () => {
 
     const servicesButton = screen.getByRole('button', { name: 'Services' });
     fireEvent.click(servicesButton);
-    expect(screen.getByRole('link', { name: 'Home Inspection' })).toBeInTheDocument();
+    expect(screen.getByText('Home Inspection')).toBeInTheDocument();
 
     fireEvent.click(servicesButton);
     expect(screen.queryByRole('link', { name: 'Home Inspection' })).not.toBeInTheDocument();

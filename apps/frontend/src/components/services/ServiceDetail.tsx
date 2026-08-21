@@ -21,8 +21,10 @@ type StartInspectionResponse = {
   };
 };
 
-export function ServiceDetail({ service, initialExpandedSubserviceId = null }: ServiceDetailProps) {
-  const subserviceRefs = useRef<Record<string, HTMLElement | null>>({});
+export function ServiceDetail({
+  service,
+  initialExpandedSubserviceId = null,
+}: Readonly<ServiceDetailProps>) {
   const ownerSectionRef = useRef<HTMLDivElement | null>(null);
   const tenantSectionRef = useRef<HTMLDivElement | null>(null);
   const selectedSubservice = service.subservices.find(
@@ -30,9 +32,6 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
   );
   const initialAudience: ServiceAudience =
     selectedSubservice?.audience === 'tenant' ? 'tenant' : 'owner';
-  const [expandedSubserviceId, setExpandedSubserviceId] = useState<string | null>(
-    initialExpandedSubserviceId,
-  );
   const [selectedAudience, setSelectedAudience] = useState<ServiceAudience>(initialAudience);
   const [selectedSpecification, setSelectedSpecification] = useState<string | null>(null);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
@@ -45,16 +44,16 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
   const [isLaunchingReport, setIsLaunchingReport] = useState(false);
   const [reportLaunchError, setReportLaunchError] = useState('');
 
-  // For construction-services, filter out coring to show separate callout
-  const shouldHideCoringSubservice = service.slug === 'construction-services';
-  const filteredSubservices = shouldHideCoringSubservice
-    ? service.subservices.filter((subservice) => subservice.id !== 'coring')
-    : service.subservices;
-
-  const ownerSubservices = filteredSubservices.filter(
+  const serviceSubservices = service.subservices.filter(
+    (subservice) => subservice.category !== 'resource',
+  );
+  const resourceSubservices = service.subservices.filter(
+    (subservice) => subservice.category === 'resource',
+  );
+  const ownerSubservices = serviceSubservices.filter(
     (subservice) => subservice.audience === 'owner',
   );
-  const tenantSubservices = filteredSubservices.filter(
+  const tenantSubservices = serviceSubservices.filter(
     (subservice) => subservice.audience === 'tenant',
   );
   const hasAudienceSections = ownerSubservices.length > 0 && tenantSubservices.length > 0;
@@ -98,21 +97,6 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
       cancelled = true;
     };
   }, [service.slug]);
-
-  useEffect(() => {
-    if (!initialExpandedSubserviceId) {
-      return;
-    }
-
-    const targetSubservice = subserviceRefs.current[initialExpandedSubserviceId];
-    if (typeof targetSubservice?.scrollIntoView === 'function') {
-      targetSubservice.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [initialExpandedSubserviceId, service.slug]);
-
-  function toggleSubservice(subserviceId: string) {
-    setExpandedSubserviceId((previous) => (previous === subserviceId ? null : subserviceId));
-  }
 
   function scrollToAudienceSection(audience: ServiceAudience) {
     const section = audience === 'owner' ? ownerSectionRef.current : tenantSectionRef.current;
@@ -184,72 +168,63 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
 
   function renderSubserviceList(subservices: Subservice[]) {
     return (
-      <div className="space-y-3">
-        {subservices.map((subservice) => {
-          const isExpanded = expandedSubserviceId === subservice.id;
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {subservices.map((subservice, index) => (
+          <article
+            key={subservice.id}
+            id={`subservice-${subservice.id}`}
+            className="animate-fade-up-delay-1 group relative overflow-hidden rounded-xl border border-slate-700 bg-gradient-to-br from-indigo-400/10 via-slate-900 to-slate-900 p-5 transition duration-300 hover:-translate-y-1 hover:border-slate-500"
+            style={{ animationDelay: `${120 + index * 60}ms` }}
+          >
+            <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-indigo-300/10 blur-2xl" />
+            <div className="relative z-10">
+              <h3 className="font-serif text-xl text-white">{subservice.name}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-200">{subservice.description}</p>
+              {canRequestQuoteForSubservice(subservice) ? (
+                <button
+                  type="button"
+                  onClick={() => openQuoteModal(subservice.name)}
+                  className="mt-4 inline-flex rounded-md border border-indigo-400/40 px-3 py-1.5 text-xs font-semibold text-indigo-200 transition hover:border-indigo-300 hover:bg-indigo-500/10 hover:text-white"
+                >
+                  Get a Quote
+                </button>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    );
+  }
 
-          return (
-            <article
-              key={subservice.id}
-              id={`subservice-${subservice.id}`}
-              ref={(element) => {
-                subserviceRefs.current[subservice.id] = element;
-              }}
-              className="scroll-mt-28 rounded-xl border border-slate-700 bg-slate-900/90"
-            >
-              <button
-                type="button"
-                onClick={() => toggleSubservice(subservice.id)}
-                aria-expanded={isExpanded}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-              >
-                <span className="font-semibold text-white">{subservice.name}</span>
-                <span className="text-slate-300">{isExpanded ? '−' : '+'}</span>
-              </button>
-
-              {isExpanded && (
-                <div className="border-t border-slate-700 px-5 py-4">
-                  <p className="text-sm leading-7 text-slate-200">{subservice.description}</p>
-
-                  {subservice.forms && subservice.forms.length > 0 ? (
-                    <div className="mt-5 rounded-lg border border-slate-600/80 bg-slate-950/70 p-4">
-                      <p className="text-xs font-semibold tracking-[0.2em] text-slate-300 uppercase">
-                        Available Forms
-                      </p>
-                      <ul className="mt-3 space-y-2">
-                        {subservice.forms.map((form) => (
-                          <li key={form.id}>
-                            <a
-                              href={form.href}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="group flex items-center justify-between rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-100 transition hover:border-indigo-400 hover:bg-slate-800"
-                            >
-                              <span>{form.name}</span>
-                              <span className="text-xs font-medium text-indigo-300 transition group-hover:text-indigo-200">
-                                Open PDF
-                              </span>
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-
-                  {canRequestQuoteForSubservice(subservice) ? (
-                    <button
-                      type="button"
-                      onClick={() => openQuoteModal(subservice.name)}
-                      className="mt-4 inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500"
+  function renderResourceList(resources: Subservice[]) {
+    return (
+      <div className="grid gap-5 md:grid-cols-2">
+        {resources.map((resource) => (
+          <article
+            key={resource.id}
+            className="rounded-xl border border-slate-700 bg-slate-900/90 p-5"
+          >
+            <h3 className="font-serif text-xl text-white">{resource.name}</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-300">{resource.description}</p>
+            {resource.forms?.length ? (
+              <ul className="mt-4 space-y-2">
+                {resource.forms.map((form) => (
+                  <li key={form.id}>
+                    <a
+                      href={form.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between rounded-md border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm font-semibold text-slate-100 transition hover:border-indigo-400 hover:bg-slate-800"
                     >
-                      Request a Quote
-                    </button>
-                  ) : null}
-                </div>
-              )}
-            </article>
-          );
-        })}
+                      <span>{form.name}</span>
+                      <span className="text-xs text-indigo-300">Open PDF</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </article>
+        ))}
       </div>
     );
   }
@@ -257,14 +232,6 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
   return (
     <section className="mx-auto w-full max-w-6xl space-y-8 px-6 py-10 md:px-10 md:py-12">
       <div className="flex flex-wrap items-start justify-between gap-6">
-        <div className="max-w-4xl space-y-4">
-          <p className="text-xs font-semibold tracking-[0.28em] text-slate-300 uppercase">
-            Services
-          </p>
-          <h1 className="font-serif text-4xl text-white md:text-5xl">{service.name}</h1>
-          <p className="text-base leading-8 text-slate-200 md:text-lg">{service.overview}</p>
-        </div>
-
         {service.slug === 'home-inspection' && isInspectorAuthenticated ? (
           <div className="w-full max-w-md rounded-xl border border-indigo-400/35 bg-indigo-500/8 p-4">
             <p className="text-xs font-semibold tracking-[0.2em] text-indigo-200 uppercase">
@@ -320,7 +287,7 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
         ) : null}
       </div>
 
-      {service.subservices.length > 0 ? (
+      {serviceSubservices.length > 0 ? (
         <div className="space-y-4">
           {hasAudienceSections ? (
             <>
@@ -367,39 +334,27 @@ export function ServiceDetail({ service, initialExpandedSubserviceId = null }: S
           ) : (
             <>
               <h2 className="font-serif text-2xl text-white">Subservices</h2>
-              {renderSubserviceList(filteredSubservices)}
-
-              {shouldHideCoringSubservice && (
-                <div className="mt-6 rounded-xl border border-orange-500/40 bg-gradient-to-r from-orange-600/15 via-slate-900 to-slate-900 p-6">
-                  <p className="text-xs font-semibold tracking-[0.2em] text-orange-300 uppercase">
-                    Specialized Service
-                  </p>
-                  <h3 className="mt-3 font-serif text-2xl text-white">Precision Coring Services</h3>
-                  <p className="mt-2 text-sm leading-7 text-slate-300">
-                    Our dedicated coring team specializes in concrete sawing, drilling, grinding,
-                    and removal services. Explore our full range of coring solutions with detailed
-                    service descriptions and capabilities.
-                  </p>
-                  <Link
-                    href="/coring"
-                    className="mt-4 inline-flex items-center rounded-md border border-orange-400/40 bg-orange-600/20 px-4 py-2 text-sm font-semibold text-orange-200 transition hover:border-orange-400 hover:bg-orange-600/30 hover:text-orange-100"
-                  >
-                    View Full Coring Services →
-                  </Link>
-                </div>
-              )}
+              {renderSubserviceList(serviceSubservices)}
             </>
           )}
         </div>
-      ) : (
-        <div className="rounded-xl border border-slate-700 bg-slate-900/90 p-6">
-          <h2 className="font-serif text-2xl text-white">Subservices</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-200">
-            This service is delivered as a comprehensive consulting offering with tailored scope
-            based on project requirements.
-          </p>
-        </div>
-      )}
+      ) : null}
+
+      {resourceSubservices.length > 0 ? (
+        <section className="space-y-4 border-t border-slate-700/70 pt-10">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.28em] text-slate-300 uppercase">
+              Resources
+            </p>
+            <h2 className="mt-2 font-serif text-2xl text-white">Property Forms</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
+              Forms and documents for owners and tenants are kept separate from our service
+              offerings.
+            </p>
+          </div>
+          {renderResourceList(resourceSubservices)}
+        </section>
+      ) : null}
 
       <div className="pt-2">
         <button

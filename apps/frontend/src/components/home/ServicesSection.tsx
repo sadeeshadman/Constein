@@ -12,13 +12,13 @@ const serviceStyles: Record<string, { tone: string; glow: string }> = {
     tone: 'from-teal-900/70 via-slate-900 to-slate-900',
     glow: 'bg-teal-300/15',
   },
-  'construction-services': {
+  construction: {
     tone: 'from-indigo-900/70 via-slate-900 to-slate-900',
     glow: 'bg-indigo-300/15',
   },
-  'engineering-consultants': {
-    tone: 'from-slate-800/80 via-slate-900 to-slate-900',
-    glow: 'bg-slate-400/15',
+  coring: {
+    tone: 'from-orange-950/80 via-slate-900 to-slate-900',
+    glow: 'bg-orange-400/15',
   },
 };
 
@@ -28,7 +28,7 @@ export function ServicesSection() {
       <SectionHeading
         eyebrow="Services"
         title="Complete Property Support from a Single Team"
-        description="From inspections to engineering guidance, our four specialized services work together to simplify every stage of your home and property needs."
+        description="From inspections and property management to construction and precision coring, our four specialized services work together to simplify every stage of your property needs."
       />
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">

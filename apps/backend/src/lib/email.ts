@@ -132,7 +132,7 @@ export async function sendQuoteEmails(payload: QuoteEmailPayload): Promise<Email
     return { sent: false, reason: 'Email settings are not configured' };
   }
 
-  const companyEmail = process.env.QUOTE_INBOX_EMAIL ?? 'shadmansadee@gmail.com';
+  const companyEmail = process.env.QUOTE_INBOX_EMAIL ?? 'info@consteingroup.ca';
 
   try {
     const companyResult = await resend.emails.send({

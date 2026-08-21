@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 type QuoteEmailPayload = {
   name: string;
@@ -17,10 +17,6 @@ type EmailDispatchResult = {
   sent: boolean;
   reason?: string;
 };
-
-function toBool(value: string | undefined): boolean {
-  return value === 'true' || value === '1';
-}
 
 function escapeHtml(value: string): string {
   return value
@@ -118,42 +114,28 @@ function buildCustomerEmailHtml(payload: QuoteEmailPayload): string {
   `;
 }
 
-function createTransporter() {
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPortRaw = process.env.SMTP_PORT;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+function createResendClient(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY;
 
-  if (!smtpHost || !smtpPortRaw || !smtpUser || !smtpPass) {
+  if (!apiKey) {
     return null;
   }
 
-  const smtpPort = Number(smtpPortRaw);
-  const secure = toBool(process.env.SMTP_SECURE);
-
-  return nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
+  return new Resend(apiKey);
 }
 
 export async function sendQuoteEmails(payload: QuoteEmailPayload): Promise<EmailDispatchResult> {
-  const transporter = createTransporter();
-  const fromEmail = process.env.SMTP_FROM_EMAIL;
+  const resend = createResendClient();
+  const fromEmail = process.env.EMAIL_FROM;
 
-  if (!transporter || !fromEmail) {
+  if (!resend || !fromEmail) {
     return { sent: false, reason: 'Email settings are not configured' };
   }
 
   const companyEmail = process.env.QUOTE_INBOX_EMAIL ?? 'shadmansadee@gmail.com';
 
   try {
-    await transporter.sendMail({
+    const companyResult = await resend.emails.send({
       from: fromEmail,
       to: companyEmail,
       replyTo: payload.email,
@@ -162,13 +144,21 @@ export async function sendQuoteEmails(payload: QuoteEmailPayload): Promise<Email
       html: buildCompanyEmailHtml(payload),
     });
 
-    await transporter.sendMail({
+    if (companyResult.error) {
+      return { sent: false, reason: companyResult.error.message };
+    }
+
+    const customerResult = await resend.emails.send({
       from: fromEmail,
       to: payload.email,
       subject: 'Constein Group: We Received Your Quote Request',
       text: buildCustomerEmailText(payload),
       html: buildCustomerEmailHtml(payload),
     });
+
+    if (customerResult.error) {
+      return { sent: false, reason: customerResult.error.message };
+    }
 
     return { sent: true };
   } catch (error: unknown) {

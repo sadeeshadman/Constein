@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { services } from '@/lib/services';
-import { getServicePath, getSubservicePath } from '@/lib/servicePaths';
+import { getServicePath } from '@/lib/servicePaths';
 
 const navItemsBeforeServices = [{ label: 'Home', href: '/#home' }];
 const navItemsAfterServices = [
@@ -55,15 +55,40 @@ export function SiteHeader() {
             </Link>
           ))}
 
-          <button
-            type="button"
-            onMouseEnter={() => setServicesOpen(true)}
-            onClick={() => setServicesOpen((previous) => !previous)}
-            aria-expanded={servicesOpen}
-            className="rounded-md px-2 py-1 transition-colors hover:bg-slate-800 hover:text-white"
-          >
-            Services
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onMouseEnter={() => setServicesOpen(true)}
+              onClick={() => setServicesOpen((previous) => !previous)}
+              aria-expanded={servicesOpen}
+              aria-haspopup="menu"
+              className="rounded-md px-2 py-1 transition-colors hover:bg-slate-800 hover:text-white"
+            >
+              Services
+            </button>
+
+            {servicesOpen && (
+              <div
+                role="menu"
+                aria-label="Services menu"
+                className="absolute left-0 top-full z-40 mt-2 w-64 overflow-hidden rounded-md border border-slate-700 bg-slate-950/98 shadow-2xl backdrop-blur"
+              >
+                <div className="flex flex-col gap-1 py-2">
+                  {services.map((service) => (
+                    <div key={service.slug}>
+                      <Link
+                        href={getServicePath(service.slug)}
+                        onClick={() => setServicesOpen(false)}
+                        className="block border-b border-slate-700 px-3 py-2 font-semibold text-slate-100 transition last:border-b-0 hover:border-slate-300 hover:text-white"
+                      >
+                        {service.name}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {navItemsAfterServices.map((item) => (
             <Link
@@ -86,41 +111,6 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      {servicesOpen && (
-        <div className="absolute top-full left-0 z-40 w-full border-t border-slate-700 bg-slate-950/98 shadow-2xl backdrop-blur">
-          <div className="grid w-full grid-cols-1 gap-8 px-6 py-6 md:grid-cols-2 md:px-10 xl:grid-cols-4 xl:gap-6">
-            {services.map((service) => (
-              <div key={service.slug} className="min-w-0 space-y-3 xl:px-3">
-                <Link
-                  href={getServicePath(service.slug)}
-                  onClick={() => setServicesOpen(false)}
-                  className="inline-flex border-b border-slate-700 pb-1 font-semibold text-slate-100 hover:text-white"
-                >
-                  {service.name}
-                </Link>
-
-                {service.subservices.length > 0 ? (
-                  <ul className="space-y-2 text-xs leading-6 text-slate-300">
-                    {service.subservices.map((subservice) => (
-                      <li key={subservice.id}>
-                        <Link
-                          href={getSubservicePath(service.slug, subservice.id)}
-                          onClick={() => setServicesOpen(false)}
-                          className="transition-colors hover:text-slate-100"
-                        >
-                          {subservice.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-xs leading-6 text-slate-400">{service.shortDescription}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </header>
   );
 }

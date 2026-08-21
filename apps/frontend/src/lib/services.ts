@@ -3,6 +3,7 @@ export type Subservice = {
   name: string;
   description: string;
   audience?: 'owner' | 'tenant';
+  category?: 'service' | 'resource';
   forms?: FormResource[];
 };
 
@@ -116,6 +117,7 @@ export const services: Service[] = [
         description:
           'Owner-focused forms and documentation support for inspections, onboarding, and routine property workflows.',
         audience: 'owner',
+        category: 'resource',
         forms: [
           {
             id: 'owner-eviction-notice-n12',
@@ -144,23 +146,18 @@ export const services: Service[] = [
         description:
           'Tenant-facing forms for applications, requests, and communication throughout the tenancy lifecycle.',
         audience: 'tenant',
+        category: 'resource',
       },
     ],
   },
   {
-    slug: 'construction-services',
+    slug: 'construction',
     name: 'Construction Services',
     shortDescription:
       'Structured project delivery for renovations and upgrades with clear timelines, quality checks, and execution.',
     overview:
       'Our Construction Services team supports residential and light commercial projects with disciplined execution and field oversight. From testing and prep work to finishing support, we deliver practical solutions that match project goals and budgets.',
     subservices: [
-      {
-        id: 'coring',
-        name: 'Coring',
-        description:
-          'Precision concrete coring for mechanical, electrical, and plumbing pathways with controlled site practices.',
-      },
       {
         id: 'concrete-testing',
         name: 'Concrete Testing',
@@ -194,13 +191,50 @@ export const services: Service[] = [
     ],
   },
   {
-    slug: 'engineering-consultants',
-    name: 'Engineering Consultants',
+    slug: 'coring',
+    name: 'Coring',
     shortDescription:
-      'Technical consulting for structural and systems planning to keep your project safe, efficient, and compliant.',
+      'Precision concrete cutting, drilling, grinding, sawing, and removal for construction and infrastructure projects.',
     overview:
-      'Our Engineering Consultants provide technical analysis and practical planning support for renovation and development decisions. We help clients align scope, safety, and compliance requirements before and during project execution.',
-    subservices: [],
+      'Our Coring service delivers precise concrete cutting and drilling solutions for mechanical, electrical, plumbing, renovation, and demolition projects. We combine controlled equipment, experienced operators, and careful site practices to help keep your project accurate, efficient, and safe.',
+    subservices: [
+      {
+        id: 'slab-sawing',
+        name: 'Slab Sawing',
+        description:
+          'Precision cutting through concrete slabs for mechanical, electrical, and plumbing installations with minimal disturbance.',
+      },
+      {
+        id: 'core-drilling',
+        name: 'Core Drilling',
+        description:
+          'Accurate circular drilling through concrete for utilities, anchors, services, and structural modifications.',
+      },
+      {
+        id: 'concrete-grinding',
+        name: 'Concrete Grinding',
+        description:
+          'Controlled surface grinding for floor preparation, coating removal, smoothing, and concrete restoration.',
+      },
+      {
+        id: 'wire-sawing',
+        name: 'Wire Sawing',
+        description:
+          'Advanced wire cutting for thick or complex concrete sections where precise separation is required.',
+      },
+      {
+        id: 'wall-sawing',
+        name: 'Wall Sawing',
+        description:
+          'Clean, accurate wall cuts for openings, alterations, penetrations, and structural modifications.',
+      },
+      {
+        id: 'breaking-removal',
+        name: 'Breaking & Removal',
+        description:
+          'Controlled concrete breaking, removal, debris handling, and site cleanup for renovation and demolition work.',
+      },
+    ],
   },
 ];
 

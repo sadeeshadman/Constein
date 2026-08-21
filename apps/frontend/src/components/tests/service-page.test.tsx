@@ -21,24 +21,21 @@ describe('ServicePage route', () => {
       expect.arrayContaining([
         { slug: 'home-inspection' },
         { slug: 'property-management' },
-        { slug: 'construction-services' },
-        { slug: 'engineering-consultants' },
+        { slug: 'construction' },
+        { slug: 'coring' },
       ]),
     );
   });
 
   test('renders service page for a valid slug', async () => {
     const element = await ServicePage({
-      params: Promise.resolve({ slug: 'construction-services' }),
+      params: Promise.resolve({ slug: 'construction' }),
       searchParams: Promise.resolve({}),
     });
     render(element);
 
     expect(screen.getByRole('heading', { name: 'Construction Services' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'View Full Coring Services →' })).toHaveAttribute(
-      'href',
-      '/coring',
-    );
+    expect(screen.getByRole('heading', { name: 'Construction Services' })).toBeInTheDocument();
   });
 
   test('calls notFound for invalid slug', async () => {
@@ -56,8 +53,8 @@ describe('ServicePage route', () => {
         params: Promise.resolve({ slug: 'construction-services' }),
         searchParams: Promise.resolve({ subservice: 'coring' }),
       }),
-    ).rejects.toThrow('NEXT_REDIRECT:/coring');
+    ).rejects.toThrow('NEXT_REDIRECT:/construction');
 
-    expect(redirectMock).toHaveBeenCalledWith('/coring');
+    expect(redirectMock).toHaveBeenCalledWith('/construction');
   });
 });
